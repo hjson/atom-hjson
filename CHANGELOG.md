@@ -1,1 +1,1 @@
-## 0.0.1 -- First Release :confetti_ball:
+## 0.1.0 -- First Release :confetti_ball:
