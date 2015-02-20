@@ -1,5 +1,5 @@
-# Hjson language supprt in Atom
+# Hjson language support in Atom
 
-Adds syntax highlighting of Hjson files in Atom.
+Adds syntax highlighting of [Hjson](http://hjson.org/) files in Atom.
 
 Originally converted from the [Hjson Sublime Text package](https://github.com/laktak/sublime-hjson).
