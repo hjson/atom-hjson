@@ -1,0 +1,13 @@
+{
+  "name": "language-hjson",
+  "version": "0.0.1",
+  "description": "Hjson language support in Atom",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-hjson",
+  "repository": "https://github.com/dannyfritz/language-hjson",
+  "license": "MIT",
+  "dependencies": {}
+}
