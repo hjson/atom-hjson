@@ -6,8 +6,8 @@
     "atom": ">=0.174.0 <2.0.0",
     "node": "*"
   },
-  "homepage": "https://github.com/dannyfritz/language-hjson",
-  "repository": "https://github.com/dannyfritz/language-hjson",
+  "homepage": "https://github.com/hjson/atom-hjson",
+  "repository": "https://github.com/hjson/atom-hjson",
   "license": "MIT",
   "dependencies": {}
 }
