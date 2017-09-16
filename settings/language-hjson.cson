@@ -4,7 +4,7 @@
         (?x:           # turn on extended mode
             ^          # a line beginning with
             \s*        # some optional space
-            [{\[]      # the start of an object or array
+            [{\\[]      # the start of an object or array
             (?!        # but not followed by
                 .*     # whatever
                 [}\]]  # and the close of an object or array
@@ -13,7 +13,7 @@
                 $      # at the end of the line
             )
             |          # ...or...
-            [{\[]      # the start of an object or array
+            [{\\[]      # the start of an object or array
             \s*        # some optional space
             $          # at the end of the line
         )
