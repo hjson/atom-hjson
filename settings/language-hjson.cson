@@ -1,5 +1,6 @@
 ".source.hjson":
   editor:
+      commentStart: '// '
       foldEndPattern: '''
         (?x:           # turn on extended mode
             ^          # a line beginning with
