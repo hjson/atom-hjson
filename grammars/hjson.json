@@ -41,6 +41,9 @@
       "patterns":
       [
         {
+          "include": "#key-mstring"
+        },
+        {
           "include": "#key-value"
         },
         {
@@ -51,6 +54,9 @@
         },
         {
           "include": "#array"
+        },
+        {
+          "include": "#mstring"
         },
         {
           "name": "punctuation.separator.dictionary.key-value.hjson",
@@ -76,6 +82,9 @@
           "include": "#comments"
         },
         {
+          "include": "#key-mstring"
+        },
+        {
           "include": "#key-value"
         },
         {
@@ -86,6 +95,9 @@
         },
         {
           "include": "#array"
+        },
+        {
+          "include": "#mstring"
         },
         {
           "name": "punctuation.separator.dictionary.pair.hjson",
@@ -103,10 +115,13 @@
       "patterns":
       [
         {
+          "include": "#comments"
+        },
+        {
           "include": "#value"
         },
         {
-          "include": "#comments"
+          "include": "#mstring"
         },
         {
           "name": "punctuation.separator.array.hjson",
@@ -136,6 +151,24 @@
           ]
         }
       }
+    },
+    "key-mstring":
+    {
+      "contentName": "string.quoted.multiline.hjson",
+      "begin": "((?:[^,\\{\\[\\}\\]\\s]+?)|\"(?:[^\"\\\\]|\\\\.)*?\")\\s*(:)\\s*(''')",
+      "end": "'''",
+      "beginCaptures": {
+        "1": {
+          "name": "string.quoted.keyname.hjson"
+        },
+        "2": {
+          "name": "punctuation.separator.dictionary.key-value.hjson"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.hjson"
+        }
+      },
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.hjson" } }
     },
     "just-key":
     {
