@@ -206,6 +206,10 @@ repository:
             # Invalid escape characters
             match: '\\\\.'
             name: 'invalid.illegal.unrecognized-string-escape.hjson'
+          ,
+            # Strings that go past the line
+            match: '[^"]*[^\\n\\r"\\\\]$'
+            name: 'invalid.illegal.string.hjson'
         ]
       ,
         # Single-quoted string
@@ -229,6 +233,10 @@ repository:
             # Invalid escape characters
             match: '\\\\.'
             name: 'invalid.illegal.unrecognized-string-escape.hjson'
+          ,
+            # Strings that go past the line
+            match: '[^\']*[^\\n\\r\'\\\\]$'
+            name: 'invalid.illegal.string.hjson'
         ]
     ]
 
