@@ -62,10 +62,6 @@
           "include": "#mstring"
         },
         {
-          "name": "punctuation.separator.dictionary.key-value.hjson",
-          "match": ":"
-        },
-        {
           "name": "punctuation.separator.dictionary.pair.hjson",
           "match": ","
         }
