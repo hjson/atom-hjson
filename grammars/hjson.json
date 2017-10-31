@@ -10,9 +10,9 @@
   "keyEquivalent": "^~J",
   "patterns":
   [
-    { "include": "#comments" },
     { "include": "#rootObject" },
-    { "include": "#value" }
+    { "include": "#value" },
+    { "include": "#comments" }
   ],
   "repository":
   {
@@ -21,14 +21,13 @@
       "comment": "the 'value' diagram at http://json.org",
       "patterns":
       [
-        { "include": "#constant" },
-        { "include": "#number" },
         { "include": "#string" },
-        { "include": "#array" },
-        { "include": "#object" },
-        { "include": "#comments" },
         { "include": "#mstring" },
-        { "include": "#ustring" }
+        { "include": "#ustring" },
+        { "include": "#number" },
+        { "include": "#object" },
+        { "include": "#array" },
+        { "include": "#constant" }
       ]
     },
     "rootObject":
@@ -42,14 +41,28 @@
       "patterns":
       [
         {
-          "include": "#keyname"
+          "include": "#comments"
+        },
+        {
+          "include": "#key-mstring"
+        },
+        {
+          "include": "#key-value"
+        },
+        {
+          "include": "#just-key"
+        },
+        {
+          "include": "#object"
+        },
+        {
+          "include": "#array"
+        },
+        {
+          "include": "#mstring"
         },
         {
           "include": "#value"
-        },
-        {
-          "name": "punctuation.separator.dictionary.key-value.hjson",
-          "match": ":"
         },
         {
           "name": "punctuation.separator.dictionary.pair.hjson",
@@ -68,14 +81,28 @@
       "patterns":
       [
         {
-          "include": "#keyname"
+          "include": "#comments"
+        },
+        {
+          "include": "#key-mstring"
+        },
+        {
+          "include": "#key-value"
+        },
+        {
+          "include": "#just-key"
+        },
+        {
+          "include": "#object"
+        },
+        {
+          "include": "#array"
+        },
+        {
+          "include": "#mstring"
         },
         {
           "include": "#value"
-        },
-        {
-          "name": "punctuation.separator.dictionary.key-value.hjson",
-          "match": ":"
         },
         {
           "name": "punctuation.separator.dictionary.pair.hjson",
@@ -93,14 +120,17 @@
       "patterns":
       [
         {
-          "include": "#value"
-        },
-        {
           "include": "#comments"
         },
         {
+          "include": "#value"
+        },
+        {
+          "include": "#mstring"
+        },
+        {
           "name": "punctuation.separator.array.hjson",
-          "match": "(,)|($)"
+          "match": "(,)"
         },
         {
           "name": "invalid.illegal.expected-array-separator.hjson",
@@ -108,10 +138,57 @@
         }
       ]
     },
-    "keyname":
+    "key-value":
     {
-      "name": "string.quoted.keyname.hjson",
-      "match": "(([^,\\{\\[\\}\\]\\s]+)|\"(?:[^\"\\\\]|\\\\.)*\")\\s*(?=:)"
+      "match": "((?:[^,\\{\\[\\}\\]\\s]+?)|\"(?:[^\"\\\\]|\\\\.)*?\")\\s*(:)\\s*([^,\\{\\[\\}\\]\\s].*?)(,)?$\\n?",
+      "captures": {
+        "1": {
+          "name": "string.quoted.keyname.hjson"
+        },
+        "2": {
+          "name": "punctuation.separator.dictionary.key-value.hjson"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#value"
+            }
+          ]
+        },
+        "4": {
+          "name": "punctuation.separator.dictionary.pair.hjson"
+        }
+      }
+    },
+    "key-mstring":
+    {
+      "contentName": "string.quoted.multiline.hjson",
+      "begin": "((?:[^,\\{\\[\\}\\]\\s]+?)|\"(?:[^\"\\\\]|\\\\.)*?\")\\s*(:)\\s*(''')",
+      "end": "'''",
+      "beginCaptures": {
+        "1": {
+          "name": "string.quoted.keyname.hjson"
+        },
+        "2": {
+          "name": "punctuation.separator.dictionary.key-value.hjson"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.hjson"
+        }
+      },
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.hjson" } }
+    },
+    "just-key":
+    {
+      "match": "((?:[^,\\{\\[\\}\\]\\s]+?)|\"(?:[^\"\\\\]|\\\\.)*?\")\\s*(:)",
+      "captures": {
+        "1": {
+          "name": "string.quoted.keyname.hjson"
+        },
+        "2": {
+          "name": "punctuation.separator.dictionary.key-value.hjson"
+        }
+      }
     },
     "string":
     {
