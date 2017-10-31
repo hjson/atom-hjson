@@ -41,6 +41,9 @@
       "patterns":
       [
         {
+          "include": "#comments"
+        },
+        {
           "include": "#key-mstring"
         },
         {
