@@ -10,9 +10,9 @@
   "keyEquivalent": "^~J",
   "patterns":
   [
-    { "include": "#comments" },
     { "include": "#rootObject" },
-    { "include": "#value" }
+    { "include": "#value" },
+    { "include": "#comments" }
   ],
   "repository":
   {
@@ -21,14 +21,13 @@
       "comment": "the 'value' diagram at http://json.org",
       "patterns":
       [
-        { "include": "#constant" },
-        { "include": "#number" },
         { "include": "#string" },
-        { "include": "#array" },
-        { "include": "#object" },
-        { "include": "#comments" },
         { "include": "#mstring" },
-        { "include": "#ustring" }
+        { "include": "#ustring" },
+        { "include": "#number" },
+        { "include": "#object" },
+        { "include": "#array" },
+        { "include": "#constant" }
       ]
     },
     "rootObject":
@@ -42,10 +41,16 @@
       "patterns":
       [
         {
-          "include": "#keyname"
+          "include": "#key-value"
         },
         {
-          "include": "#value"
+          "include": "#just-key"
+        },
+        {
+          "include": "#object"
+        },
+        {
+          "include": "#array"
         },
         {
           "name": "punctuation.separator.dictionary.key-value.hjson",
@@ -68,14 +73,19 @@
       "patterns":
       [
         {
-          "include": "#keyname"
+          "include": "#comments"
         },
         {
-          "include": "#value"
+          "include": "#key-value"
         },
         {
-          "name": "punctuation.separator.dictionary.key-value.hjson",
-          "match": ":"
+          "include": "#just-key"
+        },
+        {
+          "include": "#object"
+        },
+        {
+          "include": "#array"
         },
         {
           "name": "punctuation.separator.dictionary.pair.hjson",
@@ -100,7 +110,7 @@
         },
         {
           "name": "punctuation.separator.array.hjson",
-          "match": "(,)|($)"
+          "match": "(,)"
         },
         {
           "name": "invalid.illegal.expected-array-separator.hjson",
@@ -108,10 +118,36 @@
         }
       ]
     },
-    "keyname":
+    "key-value":
     {
-      "name": "string.quoted.keyname.hjson",
-      "match": "(([^,\\{\\[\\}\\]\\s]+)|\"(?:[^\"\\\\]|\\\\.)*\")\\s*(?=:)"
+      "match": "((?:[^,\\{\\[\\}\\]\\s]+?)|\"(?:[^\"\\\\]|\\\\.)*?\")\\s*(:)\\s*([^,\\{\\[\\}\\]\\s].*?)$\\n?",
+      "captures": {
+        "1": {
+          "name": "string.quoted.keyname.hjson"
+        },
+        "2": {
+          "name": "punctuation.separator.dictionary.key-value.hjson"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#value"
+            }
+          ]
+        }
+      }
+    },
+    "just-key":
+    {
+      "match": "((?:[^,\\{\\[\\}\\]\\s]+?)|\"(?:[^\"\\\\]|\\\\.)*?\")\\s*(:)",
+      "captures": {
+        "1": {
+          "name": "string.quoted.keyname.hjson"
+        },
+        "2": {
+          "name": "punctuation.separator.dictionary.key-value.hjson"
+        }
+      }
     },
     "string":
     {
