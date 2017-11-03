@@ -37,15 +37,43 @@ patterns: [
 repository:
   value:
     patterns: [
-        include: '#string'
-      ,
         include: '#number'
+      ,
+        include: '#constant'
+      ,
+        include: '#string'
       ,
         include: '#object'
       ,
         include: '#array'
+    ]
+
+
+  arrayValue:
+    patterns: [
+        include: '#arrayNumber'
       ,
-        include: '#constants'
+        include: '#arrayConstant'
+      ,
+        include: '#string'
+      ,
+        include: '#object'
+      ,
+        include: '#array'
+    ]
+
+
+  objectValue:
+    patterns: [
+        include: '#objectNumber'
+      ,
+        include: '#objectConstant'
+      ,
+        include: '#string'
+      ,
+        include: '#object'
+      ,
+        include: '#array'
     ]
 
 
@@ -73,6 +101,13 @@ repository:
       ,
         include: '#keyValue'
       ,
+        include: '#keyNewline'
+      ,
+        match: ':[.|\\s]'
+        name: 'invalid.illegal.object-property.hjson'
+      ,
+        include: '#keyNewlineValue'
+      ,
         # Comma as object property separator
         match: ','
         name: 'punctuation.separator.dictionary.pair.hjson'
@@ -91,29 +126,29 @@ repository:
           (?: # json string w/ \'
             \'
             (?:
-              [^\\\\] | # anything but an escape character
+              [^\\\\\'] | # anything but an escape character or quote
               (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
               (\\\\.) # bad escape characters
-            )+
+            )*
             \'
           ) |
           (?: # json string w/ "
             "
             (?:
-              [^\\\\] | # anything but an escape character
+              [^\\\\"] | # anything but an escape character or quote
               (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
               (\\\\.) # bad escape characters
-            )+
+            )*
             "
           )
         )
         \\s*
         (:)
-        (?:\\s*\\n)? # capture the line ending if there is no value on the same line
+        \\s* # capture the line ending if there is no value on the same line
       )'''
     beginCaptures:
       0:
-        name: 'meta.structure.keyValue.begin.hjson'
+        name: 'meta.structure.key-value.begin.hjson'
       1:
         name: 'string.quoted.keyname.hjson'
       2:
@@ -127,19 +162,96 @@ repository:
       6:
         name: 'punctuation.separator.dictionary.key-value.hjson'
 
-    end: '\\n'
+    end: '(?<!^)\\n|(?=\\})'
 
-    name: 'meta.structure.keyValue.hjson'
+    name: 'meta.structure.key-value.hjson'
 
     patterns: [
         # Comments - which consume the line ending
         include: '#comments'
       ,
         # Whitespace - consume the line ending
-        match: '^\\s*\\n'
+        match: '^\\s+'
       ,
         # Values - which don't consume line endings
-        include: '#value'
+        include: '#objectValue'
+    ]
+
+
+  keyNewline:
+    begin: '''
+      (?x:
+        (
+          (?:[^,\\{\\}\\[\\]\\s"']+) |
+          (?: # json string w/ \'
+            \'
+            (?:
+              [^\\\\\'] | # anything but an escape character or quote
+              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
+              (\\\\.) # bad escape characters
+            )*
+            \'
+          ) |
+          (?: # json string w/ "
+            "
+            (?:
+              [^\\\\"] | # anything but an escape character or quote
+              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
+              (\\\\.) # bad escape characters
+            )*
+            "
+          )
+        )
+        \\s+ # capture the line ending
+      )'''
+    beginCaptures:
+      0:
+        name: 'meta.structure.key-newline.begin.hjson'
+      1:
+        name: 'string.quoted.keyname.hjson'
+      2:
+        name: 'constant.character.escape.hjson'
+      3:
+        name: 'invalid.illegal.unrecognized-string-escape.hjson'
+      4:
+        name: 'constant.character.escape.hjson'
+      5:
+        name: 'invalid.illegal.unrecognized-string-escape.hjson'
+
+    end: '^\\s*:'
+    endCaptures:
+      0:
+        name: 'punctuation.separator.dictionary.key-value.hjson'
+
+    name: 'meta.structure.key-newline.hjson'
+
+    patterns: [
+        # Whitespace is the only thing allowed
+        match: '\\s+'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  keyNewlineValue:
+    begin: '(?<=:)(?:\\s*\\n)?'
+
+    # Can't end on an empty line
+    end: '(?<!^)\\n|(?=\\})'
+
+    name: 'meta.strucure.key-newline-value.hjson'
+
+    patterns: [
+        # Comments - which consume the line ending
+        include: '#comments'
+      ,
+        # Whitespace - consume the line ending
+        match: '^\\s+'
+      ,
+        # Values - which don't consume line endings
+        include: '#objectValue'
     ]
 
 
@@ -159,7 +271,7 @@ repository:
     name: 'meta.structure.array.hjson'
 
     patterns: [
-        include: '#value'
+        include: '#arrayValue'
       ,
         include: '#comments'
       ,
@@ -243,7 +355,7 @@ repository:
 
 
   ustring:
-    match: '\\b([^:,0-9\\-\\{\\[\\}\\]\\s].*)'
+    match: '([^,\\{\\[\\}\\]\\s].*)$'
     name: 'string.quoted.none.hjson'
 
 
@@ -262,26 +374,79 @@ repository:
 
 
   number:
-    match: '-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?'
-    name: 'constant.numeric.hjson'
+    match: '(-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(,[\\t ]*)?(?=$|#|/\\*|//)'
+    captures:
+      1:
+        name: 'constant.numeric.hjson'
+
+
+  arrayNumber:
+    match: '(-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(,[\\t ]*)?(?=$|#|/\\*|//|,|\\])'
+    captures:
+      1:
+        name: 'constant.numeric.hjson'
+
+
+  objectNumber:
+    match: '(-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(,[\\t ]*)?(?=$|#|/\\*|//|,|\\})'
+    captures:
+      1:
+        name: 'constant.numeric.hjson'
 
 
   constant:
-    match: '\\b(?:true|false|null)\\b'
+    match: '\\b(?:true|false|null)[\\t ]*?(?=$|#|/\\*|//)'
+    name: 'constant.language.hjson'
+
+
+  arrayConstant:
+    match: '\\b(?:true|false|null)[\\t ]*?(?=$|#|/\\*|//|,|\\])'
+    name: 'constant.language.hjson'
+
+
+  objectConstant:
+    match: '\\b(?:true|false|null)[\\t ]*?(?=$|#|/\\*|//|,|\\})'
     name: 'constant.language.hjson'
 
 
   comments:
     patterns: [
+        # Hash comment (full line)
+        match: '^\\s*(#).*(?:\\n)?'
+        name: 'comment.line.hash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Double-slash comment (full line)
+        match: '^\\s*(//).*(?:\\n)?'
+        name: 'comment.line.double-slash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Multiline block comment (full line)
+        begin: '^\\s*/\\*'
+        beginCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+        end: '\\*/(?:\\s*\\n)?'
+
+        endCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+
+        name: 'comment.block.double-slash'
+      ,
         # Hash comment
-        match: '(#).*(?:\\n)?'
+        match: '(#)[^\\n]*'
         name: 'comment.line.hash'
         captures:
           1:
             name: 'punctuation.definition.comment.hjson'
       ,
         # Double-slash comment
-        match: '(//).*(?:\\n)?'
+        match: '(//)[^\\n]*'
         name: 'comment.line.double-slash'
         captures:
           1:
@@ -292,7 +457,7 @@ repository:
         beginCaptures:
           1:
             name: 'punctuation.definition.comment.hjson'
-        end: '\\*/(?:\\s*\\n)?'
+        end: '\\*/'
 
         endCaptures:
           1:
