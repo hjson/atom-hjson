@@ -385,7 +385,7 @@ repository:
 
 
   ustring:
-    match: '([^,\\{\\[\\}\\]\\s].*)$'
+    match: '([^:,\\{\\[\\}\\]\\s].*)$'
     name: 'string.quoted.none.hjson'
 
 
