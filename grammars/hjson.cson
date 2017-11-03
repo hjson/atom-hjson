@@ -154,6 +154,9 @@ repository:
         include: '#keyNewlineValue'
       ,
         begin: '(?<=\\{|,)|,'
+        beginCaptures:
+          1:
+            name: 'punctuation.separator.dictionary.pair.hjson'
 
         end: '(?=[^\\s,/#])|(?=/[^/*])'
 
@@ -414,6 +417,9 @@ repository:
         include: '#arrayValue'
       ,
         begin: '(?<=\\[)|,'
+        beginCaptures:
+          1:
+            name: 'punctuation.separator.dictionary.pair.hjson'
 
         end: '(?=[^\\s,/#])|(?=/[^/*])'
 
