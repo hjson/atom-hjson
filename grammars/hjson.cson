@@ -32,6 +32,9 @@ patterns: [
     include: '#comments'
   ,
     include: '#value'
+  ,
+    match: '[^\\s]+'
+    name: 'invalid.illegal.excess-characters.hjson'
 ]
 
 repository:
