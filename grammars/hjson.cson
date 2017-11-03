@@ -165,10 +165,6 @@ repository:
             name: 'invalid.illegal.extra-comma.hjson'
         ]
       ,
-        # Comma as object property separator
-        match: ','
-        name: 'punctuation.separator.dictionary.pair.hjson'
-      ,
         # Anything else should be invalid
         match: '[^\\s]'
         name: 'invalid.illegal.object-property.hjson'
