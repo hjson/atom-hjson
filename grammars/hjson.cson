@@ -58,11 +58,11 @@ repository:
       ,
         include: '#arrayConstant'
       ,
-        include: '#string'
+        include: '#arrayString'
       ,
-        include: '#object'
+        include: '#arrayObject'
       ,
-        include: '#array'
+        include: '#arrayArray'
     ]
 
 
@@ -72,11 +72,11 @@ repository:
       ,
         include: '#objectConstant'
       ,
-        include: '#string'
+        include: '#objectString'
       ,
-        include: '#object'
+        include: '#objectObject'
       ,
-        include: '#array'
+        include: '#objectArray'
     ]
 
 
@@ -86,10 +86,52 @@ repository:
       0:
         name: 'punctuation.definition.dictionary.begin.hjson'
 
-    end: '\\}|(?<=\\})'
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s].*)$)?'
     endCaptures:
-      0:
+      1:
         name: 'punctuation.definition.dictionary.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'meta.structure.dictionary.hjson'
+
+    patterns: [
+        include: '#objectContent'
+    ]
+
+
+  arrayObject:
+    begin: '\\{'
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.dictionary.begin.hjson'
+
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s\\]].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.dictionary.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'meta.structure.dictionary.hjson'
+
+    patterns: [
+        include: '#objectContent'
+    ]
+
+
+  objectObject:
+    begin: '\\{'
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.dictionary.begin.hjson'
+
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s}].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.dictionary.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
 
     name: 'meta.structure.dictionary.hjson'
 
@@ -160,6 +202,7 @@ repository:
         \\s*
         (:)
         \\s* # capture the line ending if there is no value on the same line
+        (\\})?
       )'''
     beginCaptures:
       0:
@@ -176,13 +219,38 @@ repository:
         name: 'invalid.illegal.unrecognized-string-escape.hjson'
       6:
         name: 'punctuation.separator.dictionary.key-value.hjson'
+      7:
+        name: 'invalid.illegal.object-property.closing-bracket.hjson'
 
-    end: '(?<!^)\\n|\\s*(\\})'
+    end: '(?<!^)\\n|(\\})|(?<=,)'
     endCaptures:
       1:
-        name: 'invalid.illegal.object-property.hjson'
+        name: 'meta.structure.key-value-value.end.hjson'
 
     name: 'meta.structure.key-value.hjson'
+
+    patterns: [
+        include: '#comments'
+      ,
+        include: '#keyValueValue'
+      ,
+        match: '^\\s*(\\})'
+        captures:
+          1:
+            name: 'invalid.illegal.object-property.closing-bracket.hjson'
+    ]
+
+
+  keyValueValue:
+    begin: '(?=[^}/#\\s])|(?=/[^/*])'
+
+    # Can't end on an empty line
+    end: '(?<!^)(?=\\n)|(?=\\})|(,)'
+    endCaptures:
+      1:
+        name: 'punctuation.separator.dictionary.pair.hjson'
+
+    name: 'meta.structure.key-value-value.hjson'
 
     patterns: [
         # Comments - which consume the line ending
@@ -261,10 +329,7 @@ repository:
     begin: '(?<=:)(?:\\s*\\n)?'
 
     # Can't end on an empty line
-    end: '(?<!^)\\n|\\s*(\\})'
-    endCaptures:
-      1:
-        name: 'invalid.illegal.object-property.hjson'
+    end: '(?<!^)\\n|(?=\\})'
 
     name: 'meta.strucure.key-newline-value.hjson'
 
@@ -292,11 +357,59 @@ repository:
       0:
         name: 'punctuation.definition.array.begin.hjson'
 
-    end: '\\]'
+    end: '(\\])(?:\\s*([^,\\s].*)$)?'
     endCaptures:
-      0:
+      1:
         name: 'punctuation.definition.array.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
 
+    patterns: [
+        include: '#arrayContent'
+    ]
+
+
+  arrayArray:
+    name: 'meta.structure.array.hjson'
+
+    begin: '\\['
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.array.begin.hjson'
+
+    end: '(\\])(?:\\s*([^,\\s\\]].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.array.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    patterns: [
+        include: '#arrayContent'
+    ]
+
+
+  objectArray:
+    name: 'meta.structure.array.hjson'
+
+    begin: '\\['
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.array.begin.hjson'
+
+    end: '(\\])(?:\\s*([^,\\s\\}].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.array.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    patterns: [
+        include: '#arrayContent'
+    ]
+
+
+  arrayContent:
     name: 'meta.structure.array.hjson'
 
     patterns: [
@@ -337,6 +450,28 @@ repository:
     ]
 
 
+  arrayString:
+    patterns: [
+        include: '#arrayMstring'
+      ,
+        include: '#arrayJstring'
+      ,
+        include: '#ustring'
+      ,
+    ]
+
+
+  objectString:
+    patterns: [
+        include: '#objectMstring'
+      ,
+        include: '#objectJstring'
+      ,
+        include: '#ustring'
+      ,
+    ]
+
+
   jstring:
     patterns: [
         # Double-quoted string
@@ -347,23 +482,15 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: '"'
+        end: '(")(?:\\s*([^,\\s].*)$)?'
         endCaptures:
-          0:
+          1:
             name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
 
         patterns: [
-            # Valid escape characters
-            match: '\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})'
-            name: 'constant.character.escape.hjson'
-          ,
-            # Invalid escape characters
-            match: '\\\\.'
-            name: 'invalid.illegal.unrecognized-string-escape.hjson'
-          ,
-            # Strings that go past the line
-            match: '[^"]*[^\\n\\r"\\\\]$'
-            name: 'invalid.illegal.string.hjson'
+            include: '#jstringDoubleContent'
         ]
       ,
         # Single-quoted string
@@ -374,24 +501,132 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: "'"
+        end: "(')(?:\\s*([^,\\s].*)$)?"
         endCaptures:
-          0:
+          1:
             name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
 
         patterns: [
-            # Valid escape characters
-            match: '\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})'
-            name: 'constant.character.escape.hjson'
-          ,
-            # Invalid escape characters
-            match: '\\\\.'
-            name: 'invalid.illegal.unrecognized-string-escape.hjson'
-          ,
-            # Strings that go past the line
-            match: '[^\']*[^\\n\\r\'\\\\]$'
-            name: 'invalid.illegal.string.hjson'
+            include: '#jstringSingleContent'
         ]
+    ]
+
+
+  arrayJstring:
+    patterns: [
+        # Double-quoted string
+        name: 'string.quoted.double.hjson'
+
+        begin: '"'
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: '(")(?:\\s*([^,\\s\\]].*)$)?'
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringDoubleContent'
+        ]
+      ,
+        # Single-quoted string
+        name: 'string.quoted.single.hjson'
+
+        begin: "'"
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: "(')(?:\\s*([^,\\s].*)$)?"
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringSingleContent'
+        ]
+    ]
+
+
+  objectJstring:
+    patterns: [
+        # Double-quoted string
+        name: 'string.quoted.double.hjson'
+
+        begin: '"'
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: '(")(?:\\s*([^,\\s}].*)$)?'
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringDoubleContent'
+        ]
+      ,
+        # Single-quoted string
+        name: 'string.quoted.single.hjson'
+
+        begin: "'"
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: "(')(?:\\s*([^,\\s].*)$)?"
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringSingleContent'
+        ]
+    ]
+
+
+  jstringSingleContent:
+    patterns: [
+      # Valid escape characters
+      match: '\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})'
+      name: 'constant.character.escape.hjson'
+    ,
+      # Invalid escape characters
+      match: '\\\\.'
+      name: 'invalid.illegal.unrecognized-string-escape.hjson'
+    ,
+      # Strings that go past the line
+      match: '[^\']*[^\\n\\r\'\\\\]$'
+      name: 'invalid.illegal.string.hjson'
+    ]
+
+
+  jstringDoubleContent:
+    patterns: [
+      # Valid escape characters
+      match: '\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})'
+      name: 'constant.character.escape.hjson'
+    ,
+      # Invalid escape characters
+      match: '\\\\.'
+      name: 'invalid.illegal.unrecognized-string-escape.hjson'
+    ,
+      # Strings that go past the line
+      match: '[^"]*[^\\n\\r"\\\\]$'
+      name: 'invalid.illegal.string.hjson'
     ]
 
 
@@ -406,10 +641,44 @@ repository:
       0:
         name: 'punctuation.definition.string.begin.hjson'
 
-    end: "'''"
+    end: "(''')(?:\\s*([^,\\s].*)$)?"
     endCaptures:
-      0:
+      1:
         name: 'punctuation.definition.string.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'string.quoted.multiline.hjson'
+
+
+  arrayMstring:
+    begin: "'''"
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.string.begin.hjson'
+
+    end: "(''')(?:\\s*([^,\\s\\]].*)$)?"
+    endCaptures:
+      1:
+        name: 'punctuation.definition.string.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'string.quoted.multiline.hjson'
+
+
+  objectMstring:
+    begin: "'''"
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.string.begin.hjson'
+
+    end: "(''')(?:\\s*([^,\\s}].*)$)?"
+    endCaptures:
+      1:
+        name: 'punctuation.definition.string.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
 
     name: 'string.quoted.multiline.hjson'
 
