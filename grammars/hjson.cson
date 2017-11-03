@@ -193,6 +193,10 @@ repository:
       ,
         # Values - which don't consume line endings
         include: '#objectValue'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
     ]
 
 
@@ -273,6 +277,10 @@ repository:
       ,
         # Values - which don't consume line endings
         include: '#objectValue'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
     ]
 
 
