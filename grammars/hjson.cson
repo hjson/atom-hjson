@@ -126,7 +126,7 @@ repository:
       0:
         name: 'punctuation.definition.dictionary.begin.hjson'
 
-    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s}].*)$)?'
+    end: '(\\}|(?<=\\})\\}?)(?:\\s*([^,\\s}].*)$)?'
     endCaptures:
       1:
         name: 'punctuation.definition.dictionary.end.hjson'
@@ -153,7 +153,7 @@ repository:
       ,
         include: '#keyNewlineValue'
       ,
-        begin: '(?<=\\{)|,'
+        begin: '(?<=\\{|,)|,'
 
         end: '(?=[^\\s,/#])|(?=/[^/*])'
 
