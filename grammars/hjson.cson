@@ -478,7 +478,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: '(")(?:\\s*([^,\\s].*)$)?'
+        end: '(")(?:\\s*((?:[^\\s#/]|/[^/*]).*)$)?'
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -497,7 +497,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: "(')(?:\\s*([^,\\s].*)$)?"
+        end: "(')(?:\\s*((?:[^\\s#/]|/[^/*]).*)$)?"
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -520,7 +520,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: '(")(?:\\s*([^,\\s\\]].*)$)?'
+        end: '(")(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?'
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -539,7 +539,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: "(')(?:\\s*([^,\\s].*)$)?"
+        end: "(')(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?"
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -562,7 +562,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: '(")(?:\\s*([^,\\s}].*)$)?'
+        end: '(")(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?'
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -581,7 +581,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: "(')(?:\\s*([^,\\s].*)$)?"
+        end: "(')(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?"
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -637,7 +637,7 @@ repository:
       0:
         name: 'punctuation.definition.string.begin.hjson'
 
-    end: "(''')(?:\\s*([^,\\s].*)$)?"
+    end: "(''')(?:\\s*((?:[^\\s#/]|/[^/*]).*)$)?"
     endCaptures:
       1:
         name: 'punctuation.definition.string.end.hjson'
@@ -653,7 +653,7 @@ repository:
       0:
         name: 'punctuation.definition.string.begin.hjson'
 
-    end: "(''')(?:\\s*([^,\\s\\]].*)$)?"
+    end: "(''')(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?"
     endCaptures:
       1:
         name: 'punctuation.definition.string.end.hjson'
@@ -669,7 +669,7 @@ repository:
       0:
         name: 'punctuation.definition.string.begin.hjson'
 
-    end: "(''')(?:\\s*([^,\\s}].*)$)?"
+    end: "(''')(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?"
     endCaptures:
       1:
         name: 'punctuation.definition.string.end.hjson'
