@@ -684,39 +684,53 @@ repository:
 
 
   number:
-    match: '(-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(,[\\t ]*)?(?=$|#|/\\*|//)'
+    match: '(-?(?:0|(?:[1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(?=$|#|/\\*|//|\\])'
     captures:
       1:
         name: 'constant.numeric.hjson'
 
 
   arrayNumber:
-    match: '(-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(,[\\t ]*)?(?=$|#|/\\*|//|,|\\])'
+    match: '(-?(?:0|(?:[1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\]))'
     captures:
       1:
         name: 'constant.numeric.hjson'
+      2:
+        name: 'punctuation.separator.array.after-num.hjson'
 
 
   objectNumber:
-    match: '(-?(?:0|([1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(,[\\t ]*)?(?=$|#|/\\*|//|,|\\})'
+    match: '(-?(?:0|(?:[1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\}))'
     captures:
       1:
         name: 'constant.numeric.hjson'
+      2:
+        name: 'punctuation.separator.dictionary.pair.after-num.hjson'
 
 
   constant:
-    match: '\\b(?:true|false|null)[\\t ]*?(?=$|#|/\\*|//)'
-    name: 'constant.language.hjson'
+    match: '\\b(true|false|null)[\\t ]*(?=$|#|/\\*|//|\\])'
+    captures:
+      1:
+        name: 'constant.language.hjson'
 
 
   arrayConstant:
-    match: '\\b(?:true|false|null)[\\t ]*?(?=$|#|/\\*|//|,|\\])'
-    name: 'constant.language.hjson'
+    match: '\\b(true|false|null)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\]))'
+    captures:
+      1:
+        name: 'constant.language.hjson'
+      2:
+        name: 'punctuation.separator.array.after-const.hjson'
 
 
   objectConstant:
-    match: '\\b(?:true|false|null)[\\t ]*?(?=$|#|/\\*|//|,|\\})'
-    name: 'constant.language.hjson'
+    match: '\\b(true|false|null)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\}))'
+    captures:
+      1:
+        name: 'constant.language.hjson'
+      2:
+        name: 'punctuation.separator.dictionary.pair.after-const.hjson'
 
 
   comments:
