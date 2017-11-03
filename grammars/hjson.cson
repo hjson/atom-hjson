@@ -86,7 +86,7 @@ repository:
       0:
         name: 'punctuation.definition.dictionary.begin.hjson'
 
-    end: '\\}'
+    end: '\\}|(?<=\\})'
     endCaptures:
       0:
         name: 'punctuation.definition.dictionary.end.hjson'
