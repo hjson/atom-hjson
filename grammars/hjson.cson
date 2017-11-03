@@ -1,4 +1,4 @@
-name: 'hjson'
+name: 'Hjson'
 scopeName: 'source.hjson'
 fileTypes: [
   'hjson'
