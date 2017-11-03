@@ -108,6 +108,18 @@ repository:
       ,
         include: '#keyNewlineValue'
       ,
+        begin: '(?<=\\{)|,'
+
+        end: '(?=[^\\s,/#])|(?=/[^/*])'
+
+        patterns: [
+            include: '#comments'
+          ,
+            # Extra commas
+            match: ','
+            name: 'invalid.illegal.extra-comma.hjson'
+        ]
+      ,
         # Comma as object property separator
         match: ','
         name: 'punctuation.separator.dictionary.pair.hjson'
@@ -271,9 +283,21 @@ repository:
     name: 'meta.structure.array.hjson'
 
     patterns: [
+        include: '#comments'
+      ,
         include: '#arrayValue'
       ,
-        include: '#comments'
+        begin: '(?<=\\[)|,'
+
+        end: '(?=[^\\s,/#])|(?=/[^/*])'
+
+        patterns: [
+            include: '#comments'
+          ,
+            # Extra commas
+            match: ','
+            name: 'invalid.illegal.extra-comma.hjson'
+        ]
       ,
         # Comma as array value separator
         match: ','
