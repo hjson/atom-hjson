@@ -174,7 +174,10 @@ repository:
       6:
         name: 'punctuation.separator.dictionary.key-value.hjson'
 
-    end: '(?<!^)\\n|(?=\\})'
+    end: '(?<!^)\\n|\\s*(\\})'
+    endCaptures:
+      1:
+        name: 'invalid.illegal.object-property.hjson'
 
     name: 'meta.structure.key-value.hjson'
 
@@ -251,7 +254,10 @@ repository:
     begin: '(?<=:)(?:\\s*\\n)?'
 
     # Can't end on an empty line
-    end: '(?<!^)\\n|(?=\\})'
+    end: '(?<!^)\\n|\\s*(\\})'
+    endCaptures:
+      1:
+        name: 'invalid.illegal.object-property.hjson'
 
     name: 'meta.strucure.key-newline-value.hjson'
 
