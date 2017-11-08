@@ -1,0 +1,797 @@
+name: 'Hjson'
+scopeName: 'source.hjson'
+fileTypes: [
+  'hjson'
+]
+foldingStartMarker: """
+(?x:     # turn on extended mode
+  ^    # a line beginning with
+  \\s*    # some optional space
+  [{\\[]  # the start of an object or array
+  (?!    # but not followed by
+  .*   # whatever
+  [}\\]]  # and the close of an object or array
+  ,?   # an optional comma
+  \\s*  # some optional space
+  $    # at the end of the line
+  )
+  |    # ...or...
+  [{\\[]  # the start of an object or array
+  \\s*    # some optional space
+  $    # at the end of the line
+)"""
+foldingStopMarker: """
+(?x:   # turn on extended mode
+  ^    # a line beginning with
+  \\s*  # some optional space
+  [}\\]]  # and the close of an object or array
+)"""
+keyEquivalent: "^~J"
+
+patterns: [
+    include: '#comments'
+  ,
+    include: '#value'
+  ,
+    match: '[^\\s]+'
+    name: 'invalid.illegal.excess-characters.hjson'
+]
+
+repository:
+  value:
+    patterns: [
+        include: '#number'
+      ,
+        include: '#constant'
+      ,
+        include: '#string'
+      ,
+        include: '#object'
+      ,
+        include: '#array'
+    ]
+
+
+  arrayValue:
+    patterns: [
+        include: '#arrayNumber'
+      ,
+        include: '#arrayConstant'
+      ,
+        include: '#arrayString'
+      ,
+        include: '#arrayObject'
+      ,
+        include: '#arrayArray'
+    ]
+
+
+  objectValue:
+    patterns: [
+        include: '#objectNumber'
+      ,
+        include: '#objectConstant'
+      ,
+        include: '#objectString'
+      ,
+        include: '#objectObject'
+      ,
+        include: '#objectArray'
+    ]
+
+
+  object:
+    begin: '\\{'
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.dictionary.begin.hjson'
+
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.dictionary.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'meta.structure.dictionary.hjson'
+
+    patterns: [
+        include: '#objectContent'
+    ]
+
+
+  arrayObject:
+    begin: '\\{'
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.dictionary.begin.hjson'
+
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s\\]].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.dictionary.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'meta.structure.dictionary.hjson'
+
+    patterns: [
+        include: '#objectContent'
+    ]
+
+
+  objectObject:
+    begin: '\\{'
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.dictionary.begin.hjson'
+
+    end: '(\\}|(?<=\\})\\}?)(?:\\s*([^,\\s}].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.dictionary.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'meta.structure.dictionary.hjson'
+
+    patterns: [
+        include: '#objectContent'
+    ]
+
+
+  objectContent:
+    patterns: [
+        include: '#comments'
+      ,
+        include: '#keyValue'
+      ,
+        include: '#keyNewline'
+      ,
+        match: ':[.|\\s]'
+        name: 'invalid.illegal.object-property.hjson'
+      ,
+        include: '#keyNewlineValue'
+      ,
+        begin: '(?<=\\{|,)|,'
+        beginCaptures:
+          1:
+            name: 'punctuation.separator.dictionary.pair.hjson'
+
+        end: '(?=[^\\s,/#])|(?=/[^/*])'
+
+        patterns: [
+            include: '#comments'
+          ,
+            # Extra commas
+            match: ','
+            name: 'invalid.illegal.extra-comma.hjson'
+        ]
+      ,
+        # Anything else should be invalid
+        match: '[^\\s]'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  keyValue:
+    begin: '''
+      (?x:
+        (
+          (?:[^:,\\{\\}\\[\\]\\s"'][^:,\\{\\}\\[\\]\\s]*) |
+          (?: # json string w/ \'
+            \'
+            (?:
+              [^\\\\\'] | # anything but an escape character or quote
+              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
+              (\\\\.) # bad escape characters
+            )*
+            \'
+          ) |
+          (?: # json string w/ "
+            "
+            (?:
+              [^\\\\"] | # anything but an escape character or quote
+              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
+              (\\\\.) # bad escape characters
+            )*
+            "
+          )
+        )
+        \\s*
+        (:)
+        \\s* # capture the line ending if there is no value on the same line
+        (\\})?
+      )'''
+    beginCaptures:
+      0:
+        name: 'meta.structure.key-value.begin.hjson'
+      1:
+        name: 'string.quoted.keyname.hjson'
+      2:
+        name: 'constant.character.escape.hjson'
+      3:
+        name: 'invalid.illegal.unrecognized-string-escape.hjson'
+      4:
+        name: 'constant.character.escape.hjson'
+      5:
+        name: 'invalid.illegal.unrecognized-string-escape.hjson'
+      6:
+        name: 'punctuation.separator.dictionary.key-value.hjson'
+      7:
+        name: 'invalid.illegal.object-property.closing-bracket.hjson'
+
+    end: '(?<!^)\\n|(\\})|(?<=,)'
+    endCaptures:
+      1:
+        name: 'meta.structure.key-value-value.end.hjson'
+
+    name: 'meta.structure.key-value.hjson'
+
+    patterns: [
+        include: '#comments'
+      ,
+        include: '#keyValueValue'
+      ,
+        match: '^\\s*(\\})'
+        captures:
+          1:
+            name: 'invalid.illegal.object-property.closing-bracket.hjson'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  keyValueValue:
+    begin: '(?=[^}/#\\s,])|(?=/[^/*])'
+
+    # Can't end on an empty line
+    end: '(?<!^)(?=\\n)|(?=\\})|(,)'
+    endCaptures:
+      1:
+        name: 'punctuation.separator.dictionary.pair.hjson'
+
+    name: 'meta.structure.key-value-value.hjson'
+
+    patterns: [
+        # Comments - which consume the line ending
+        include: '#comments'
+      ,
+        # Whitespace - consume the line ending
+        match: '^\\s+'
+      ,
+        # Values - which don't consume line endings
+        include: '#objectValue'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  keyNewline:
+    begin: '''
+      (?x:
+        (
+          (?:[^:,\\{\\}\\[\\]\\s"'][^:,\\{\\}\\[\\]\\s]*) |
+          (?: # json string w/ \'
+            \'
+            (?:
+              [^\\\\\'] | # anything but an escape character or quote
+              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
+              (\\\\.) # bad escape characters
+            )*
+            \'
+          ) |
+          (?: # json string w/ "
+            "
+            (?:
+              [^\\\\"] | # anything but an escape character or quote
+              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
+              (\\\\.) # bad escape characters
+            )*
+            "
+          )
+        )
+        \\s+ # capture the line ending
+      )'''
+    beginCaptures:
+      0:
+        name: 'meta.structure.key-newline.begin.hjson'
+      1:
+        name: 'string.quoted.keyname.hjson'
+      2:
+        name: 'constant.character.escape.hjson'
+      3:
+        name: 'invalid.illegal.unrecognized-string-escape.hjson'
+      4:
+        name: 'constant.character.escape.hjson'
+      5:
+        name: 'invalid.illegal.unrecognized-string-escape.hjson'
+
+    end: '^\\s*:'
+    endCaptures:
+      0:
+        name: 'punctuation.separator.dictionary.key-value.hjson'
+
+    name: 'meta.structure.key-newline.hjson'
+
+    patterns: [
+        # Whitespace is the only thing allowed
+        match: '\\s+'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  keyNewlineValue:
+    begin: '(?<=:)(?:\\s*\\n)?'
+
+    # Can't end on an empty line
+    end: '(?<!^)\\n|(?=\\})'
+
+    name: 'meta.strucure.key-newline-value.hjson'
+
+    patterns: [
+        # Comments - which consume the line ending
+        include: '#comments'
+      ,
+        # Whitespace - consume the line ending
+        match: '^\\s+'
+      ,
+        # Values - which don't consume line endings
+        include: '#objectValue'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  array:
+    name: 'meta.structure.array.hjson'
+
+    begin: '\\['
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.array.begin.hjson'
+
+    end: '(\\])(?:\\s*([^,\\s].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.array.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    patterns: [
+        include: '#arrayContent'
+    ]
+
+
+  arrayArray:
+    name: 'meta.structure.array.hjson'
+
+    begin: '\\['
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.array.begin.hjson'
+
+    end: '(\\])(?:\\s*([^,\\s\\]].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.array.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    patterns: [
+        include: '#arrayContent'
+    ]
+
+
+  objectArray:
+    name: 'meta.structure.array.hjson'
+
+    begin: '\\['
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.array.begin.hjson'
+
+    end: '(\\])(?:\\s*([^,\\s\\}].*)$)?'
+    endCaptures:
+      1:
+        name: 'punctuation.definition.array.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    patterns: [
+        include: '#arrayContent'
+    ]
+
+
+  arrayContent:
+    name: 'meta.structure.array.hjson'
+
+    patterns: [
+        include: '#comments'
+      ,
+        include: '#arrayValue'
+      ,
+        begin: '(?<=\\[)|,'
+        beginCaptures:
+          1:
+            name: 'punctuation.separator.dictionary.pair.hjson'
+
+        end: '(?=[^\\s,/#])|(?=/[^/*])'
+
+        patterns: [
+            include: '#comments'
+          ,
+            # Extra commas
+            match: ','
+            name: 'invalid.illegal.extra-comma.hjson'
+        ]
+      ,
+        # Comma as array value separator
+        match: ','
+        name: 'punctuation.separator.array.hjson'
+      ,
+        # Missing separator
+        match: '[^\\s\\]]'
+        name: 'invalid.illegal.expected-array-separator.hjson'
+    ]
+
+
+  string:
+    patterns: [
+        include: '#mstring'
+      ,
+        include: '#jstring'
+      ,
+        include: '#ustring'
+      ,
+    ]
+
+
+  arrayString:
+    patterns: [
+        include: '#arrayMstring'
+      ,
+        include: '#arrayJstring'
+      ,
+        include: '#ustring'
+      ,
+    ]
+
+
+  objectString:
+    patterns: [
+        include: '#objectMstring'
+      ,
+        include: '#objectJstring'
+      ,
+        include: '#ustring'
+      ,
+    ]
+
+
+  jstring:
+    patterns: [
+        # Double-quoted string
+        name: 'string.quoted.double.hjson'
+
+        begin: '"'
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: '(")(?:\\s*((?:[^\\s#/]|/[^/*]).*)$)?'
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringDoubleContent'
+        ]
+      ,
+        # Single-quoted string
+        name: 'string.quoted.single.hjson'
+
+        begin: "'"
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: "(')(?:\\s*((?:[^\\s#/]|/[^/*]).*)$)?"
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringSingleContent'
+        ]
+    ]
+
+
+  arrayJstring:
+    patterns: [
+        # Double-quoted string
+        name: 'string.quoted.double.hjson'
+
+        begin: '"'
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: '(")(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?'
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringDoubleContent'
+        ]
+      ,
+        # Single-quoted string
+        name: 'string.quoted.single.hjson'
+
+        begin: "'"
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: "(')(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?"
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringSingleContent'
+        ]
+    ]
+
+
+  objectJstring:
+    patterns: [
+        # Double-quoted string
+        name: 'string.quoted.double.hjson'
+
+        begin: '"'
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: '(")(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?'
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringDoubleContent'
+        ]
+      ,
+        # Single-quoted string
+        name: 'string.quoted.single.hjson'
+
+        begin: "'"
+        beginCaptures:
+          0:
+            name: 'punctuation.definition.string.begin.hjson'
+
+        end: "(')(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?"
+        endCaptures:
+          1:
+            name: 'punctuation.definition.string.end.hjson'
+          2:
+            name: 'invalid.illegal.value.hjson'
+
+        patterns: [
+            include: '#jstringSingleContent'
+        ]
+    ]
+
+
+  jstringSingleContent:
+    patterns: [
+      # Valid escape characters
+      match: '\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})'
+      name: 'constant.character.escape.hjson'
+    ,
+      # Invalid escape characters
+      match: '\\\\.'
+      name: 'invalid.illegal.unrecognized-string-escape.hjson'
+    ,
+      # Strings that go past the line
+      match: '[^\']*[^\\n\\r\'\\\\]$'
+      name: 'invalid.illegal.string.hjson'
+    ]
+
+
+  jstringDoubleContent:
+    patterns: [
+      # Valid escape characters
+      match: '\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})'
+      name: 'constant.character.escape.hjson'
+    ,
+      # Invalid escape characters
+      match: '\\\\.'
+      name: 'invalid.illegal.unrecognized-string-escape.hjson'
+    ,
+      # Strings that go past the line
+      match: '[^"]*[^\\n\\r"\\\\]$'
+      name: 'invalid.illegal.string.hjson'
+    ]
+
+
+  ustring:
+    match: '([^:,\\{\\[\\}\\]\\s].*)$'
+    name: 'string.quoted.none.hjson'
+
+
+  mstring:
+    begin: "'''"
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.string.begin.hjson'
+
+    end: "(''')(?:\\s*((?:[^\\s#/]|/[^/*]).*)$)?"
+    endCaptures:
+      1:
+        name: 'punctuation.definition.string.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'string.quoted.multiline.hjson'
+
+
+  arrayMstring:
+    begin: "'''"
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.string.begin.hjson'
+
+    end: "(''')(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?"
+    endCaptures:
+      1:
+        name: 'punctuation.definition.string.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'string.quoted.multiline.hjson'
+
+
+  objectMstring:
+    begin: "'''"
+    beginCaptures:
+      0:
+        name: 'punctuation.definition.string.begin.hjson'
+
+    end: "(''')(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?"
+    endCaptures:
+      1:
+        name: 'punctuation.definition.string.end.hjson'
+      2:
+        name: 'invalid.illegal.value.hjson'
+
+    name: 'string.quoted.multiline.hjson'
+
+
+  number:
+    match: '(-?(?:0|(?:[1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[\\t ]*(?=$|#|/\\*|//|\\])'
+    captures:
+      1:
+        name: 'constant.numeric.hjson'
+
+
+  arrayNumber:
+    match: '(-?(?:0|(?:[1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\]))'
+    captures:
+      1:
+        name: 'constant.numeric.hjson'
+      2:
+        name: 'punctuation.separator.array.after-num.hjson'
+
+
+  objectNumber:
+    match: '(-?(?:0|(?:[1-9]\\d*))(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\}))'
+    captures:
+      1:
+        name: 'constant.numeric.hjson'
+      2:
+        name: 'punctuation.separator.dictionary.pair.after-num.hjson'
+
+
+  constant:
+    match: '\\b(true|false|null)[\\t ]*(?=$|#|/\\*|//|\\])'
+    captures:
+      1:
+        name: 'constant.language.hjson'
+
+
+  arrayConstant:
+    match: '\\b(true|false|null)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\]))'
+    captures:
+      1:
+        name: 'constant.language.hjson'
+      2:
+        name: 'punctuation.separator.array.after-const.hjson'
+
+
+  objectConstant:
+    match: '\\b(true|false|null)(?:[\\t ]*(?=,)|[\\t ]*(?:(,)[\\t ]*)?(?=$|#|/\\*|//|\\}))'
+    captures:
+      1:
+        name: 'constant.language.hjson'
+      2:
+        name: 'punctuation.separator.dictionary.pair.after-const.hjson'
+
+
+  comments:
+    patterns: [
+        # Hash comment (full line)
+        match: '^\\s*(#).*(?:\\n)?'
+        name: 'comment.line.hash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Double-slash comment (full line)
+        match: '^\\s*(//).*(?:\\n)?'
+        name: 'comment.line.double-slash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Multiline block comment (full line)
+        begin: '^\\s*/\\*'
+        beginCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+        end: '\\*/(?:\\s*\\n)?'
+
+        endCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+
+        name: 'comment.block.double-slash'
+      ,
+        # Hash comment
+        match: '(#)[^\\n]*'
+        name: 'comment.line.hash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Double-slash comment
+        match: '(//)[^\\n]*'
+        name: 'comment.line.double-slash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Multiline block comment
+        begin: '/\\*'
+        beginCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+        end: '\\*/'
+
+        endCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+
+        name: 'comment.block.double-slash'
+    ]
