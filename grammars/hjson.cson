@@ -207,7 +207,7 @@ repository:
       0:
         name: 'meta.structure.key-value.begin.hjson'
       1:
-        name: 'string.quoted.keyname.hjson'
+        name: 'support.type.property-name.hjson'
       2:
         name: 'constant.character.escape.hjson'
       3:
@@ -301,7 +301,7 @@ repository:
       0:
         name: 'meta.structure.key-newline.begin.hjson'
       1:
-        name: 'string.quoted.keyname.hjson'
+        name: 'support.type.property-name.hjson'
       2:
         name: 'constant.character.escape.hjson'
       3:
