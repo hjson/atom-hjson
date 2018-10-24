@@ -144,14 +144,10 @@ repository:
     patterns: [
         include: '#comments'
       ,
-        include: '#keyValue'
-      ,
-        include: '#keyNewline'
+        include: '#key'
       ,
         match: ':[.|\\s]'
         name: 'invalid.illegal.object-property.hjson'
-      ,
-        include: '#keyNewlineValue'
       ,
         begin: '(?<=\\{|,)|,'
         beginCaptures:
@@ -169,12 +165,12 @@ repository:
         ]
       ,
         # Anything else should be invalid
-        match: '[^\\s]'
+        match: '[^\\s]+'
         name: 'invalid.illegal.object-property.hjson'
     ]
 
 
-  keyValue:
+  key:
     begin: '''
       (?x:
         (
@@ -199,9 +195,7 @@ repository:
           )
         )
         \\s*
-        (:)
-        \\s* # capture the line ending if there is no value on the same line
-        (\\})?
+        (?!\\n)
       )'''
     beginCaptures:
       0:
@@ -217,21 +211,56 @@ repository:
       5:
         name: 'invalid.illegal.unrecognized-string-escape.hjson'
       6:
+        name: 'invalid.illegal.separator.hjson'
+
+    end: '(?<!^|:)\\s*\\n'
+
+    patterns: [
+        include: '#keyValue'
+      ,
+        include: '#keyNewlineValue'
+      ,
+        include: '#keyNewline'
+      ,
+        # Anything else is invalid
+        match: '[^\\s]+'
+        name: 'invalid.illegal.object-property.hjson'
+    ]
+
+
+  keyValue:
+    begin: '''
+      (?x:
+        \\s*
+        (:)
+        \\s* # capture the line ending if there is no value on the same line
+        (\\})?
+      )'''
+    beginCaptures:
+      1:
         name: 'punctuation.separator.dictionary.key-value.hjson'
-      7:
+      2:
         name: 'invalid.illegal.object-property.closing-bracket.hjson'
 
-    end: '(?<!^)\\n|(\\})|(?<=,)'
+    # Can't end on an empty line
+    end: '(?<!^)\\s*(?=\\n)|(\\})|(,)'
     endCaptures:
       1:
-        name: 'meta.structure.key-value-value.end.hjson'
+        name: 'meta.structure.key-value.end.hjson'
+      2:
+        name: 'punctuation.separator.dictionary.pair.hjson'
 
     name: 'meta.structure.key-value.hjson'
 
     patterns: [
+        # Comments - which consume the line ending
         include: '#comments'
       ,
-        include: '#keyValueValue'
+        # Whitespace - consume the line ending
+        match: '^\\s+'
+      ,
+        # Values - which don't consume line endings
+        include: '#objectValue'
       ,
         match: '^\\s*(\\})'
         captures:
@@ -244,72 +273,11 @@ repository:
     ]
 
 
-  keyValueValue:
-    begin: '(?=[^}/#\\s,])|(?=/[^/*])'
-
-    # Can't end on an empty line
-    end: '(?<!^)(?=\\n)|(?=\\})|(,)'
-    endCaptures:
-      1:
-        name: 'punctuation.separator.dictionary.pair.hjson'
-
-    name: 'meta.structure.key-value-value.hjson'
-
-    patterns: [
-        # Comments - which consume the line ending
-        include: '#comments'
-      ,
-        # Whitespace - consume the line ending
-        match: '^\\s+'
-      ,
-        # Values - which don't consume line endings
-        include: '#objectValue'
-      ,
-        # Anything else is invalid
-        match: '[^\\s]+'
-        name: 'invalid.illegal.object-property.hjson'
-    ]
-
-
   keyNewline:
     begin: '''
       (?x:
-        (
-          (?:[^:,\\{\\}\\[\\]\\s"'][^:,\\{\\}\\[\\]\\s]*) |
-          (?: # json string w/ \'
-            \'
-            (?:
-              [^\\\\\'] | # anything but an escape character or quote
-              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
-              (\\\\.) # bad escape characters
-            )*
-            \'
-          ) |
-          (?: # json string w/ "
-            "
-            (?:
-              [^\\\\"] | # anything but an escape character or quote
-              (\\\\(?:["\'\\\\\\/bfnrt]|u[0-9a-fA-F]{4})) | # escape characters
-              (\\\\.) # bad escape characters
-            )*
-            "
-          )
-        )
         \\s+ # capture the line ending
       )'''
-    beginCaptures:
-      0:
-        name: 'meta.structure.key-newline.begin.hjson'
-      1:
-        name: 'support.type.property-name.hjson'
-      2:
-        name: 'constant.character.escape.hjson'
-      3:
-        name: 'invalid.illegal.unrecognized-string-escape.hjson'
-      4:
-        name: 'constant.character.escape.hjson'
-      5:
-        name: 'invalid.illegal.unrecognized-string-escape.hjson'
 
     end: '^\\s*:'
     endCaptures:
@@ -332,7 +300,12 @@ repository:
     begin: '(?<=:)(?:\\s*\\n)?'
 
     # Can't end on an empty line
-    end: '(?<!^)\\n|(?=\\})'
+    end: '(?<!^)\\s*(?=\\n)|(\\})|(,)'
+    endCaptures:
+      1:
+        name: 'meta.structure.key-value-value.end.hjson'
+      2:
+        name: 'punctuation.separator.dictionary.pair.hjson'
 
     name: 'meta.strucure.key-newline-value.hjson'
 
