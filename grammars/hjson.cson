@@ -216,11 +216,9 @@ repository:
     end: '(?<!^|:)\\s*\\n'
 
     patterns: [
+        include: '#commentsNewline'
+      ,
         include: '#keyValue'
-      ,
-        include: '#keyNewlineValue'
-      ,
-        include: '#keyNewline'
       ,
         # Anything else is invalid
         match: '[^\\s]+'
@@ -266,58 +264,6 @@ repository:
         captures:
           1:
             name: 'invalid.illegal.object-property.closing-bracket.hjson'
-      ,
-        # Anything else is invalid
-        match: '[^\\s]+'
-        name: 'invalid.illegal.object-property.hjson'
-    ]
-
-
-  keyNewline:
-    begin: '''
-      (?x:
-        \\s+ # capture the line ending
-      )'''
-
-    end: '^\\s*:'
-    endCaptures:
-      0:
-        name: 'punctuation.separator.dictionary.key-value.hjson'
-
-    name: 'meta.structure.key-newline.hjson'
-
-    patterns: [
-        # Whitespace is the only thing allowed
-        match: '\\s+'
-      ,
-        # Anything else is invalid
-        match: '[^\\s]+'
-        name: 'invalid.illegal.object-property.hjson'
-    ]
-
-
-  keyNewlineValue:
-    begin: '(?<=:)(?:\\s*\\n)?'
-
-    # Can't end on an empty line
-    end: '(?<!^)\\s*(?=\\n)|(\\})|(,)'
-    endCaptures:
-      1:
-        name: 'meta.structure.key-value-value.end.hjson'
-      2:
-        name: 'punctuation.separator.dictionary.pair.hjson'
-
-    name: 'meta.strucure.key-newline-value.hjson'
-
-    patterns: [
-        # Comments - which consume the line ending
-        include: '#comments'
-      ,
-        # Whitespace - consume the line ending
-        match: '^\\s+'
-      ,
-        # Values - which don't consume line endings
-        include: '#objectValue'
       ,
         # Anything else is invalid
         match: '[^\\s]+'
@@ -761,6 +707,36 @@ repository:
           1:
             name: 'punctuation.definition.comment.hjson'
         end: '\\*/'
+
+        endCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+
+        name: 'comment.block.double-slash'
+    ]
+
+  commentsNewline:
+    patterns: [
+        # Hash comment
+        match: '(#).*\\n'
+        name: 'comment.line.hash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Double-slash comment
+        match: '(//).*\\n'
+        name: 'comment.line.double-slash'
+        captures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+      ,
+        # Multiline block comment
+        begin: '/\\*'
+        beginCaptures:
+          1:
+            name: 'punctuation.definition.comment.hjson'
+        end: '\\*/(\\s*\\n)?'
 
         endCaptures:
           1:
