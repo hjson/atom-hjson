@@ -33,7 +33,7 @@ patterns: [
   ,
     include: '#value'
   ,
-    match: '[^\\s]+'
+    match: '[^\\s]'
     name: 'invalid.illegal.excess-characters.hjson'
 ]
 
@@ -86,7 +86,7 @@ repository:
       0:
         name: 'punctuation.definition.dictionary.begin.hjson'
 
-    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s].*)$)?'
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s]+))?'
     endCaptures:
       1:
         name: 'punctuation.definition.dictionary.end.hjson'
@@ -106,7 +106,7 @@ repository:
       0:
         name: 'punctuation.definition.dictionary.begin.hjson'
 
-    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s\\]].*)$)?'
+    end: '(\\}|(?<=\\}))(?:\\s*([^,\\s\\]]+))?'
     endCaptures:
       1:
         name: 'punctuation.definition.dictionary.end.hjson'
@@ -126,7 +126,7 @@ repository:
       0:
         name: 'punctuation.definition.dictionary.begin.hjson'
 
-    end: '(\\}|(?<=\\})\\}?)(?:\\s*([^,\\s}].*)$)?'
+    end: '(\\}|(?<=\\})\\}?)(?:\\s*([^,\\s}]+))?'
     endCaptures:
       1:
         name: 'punctuation.definition.dictionary.end.hjson'
@@ -165,7 +165,7 @@ repository:
         ]
       ,
         # Anything else should be invalid
-        match: '[^\\s]+'
+        match: '[^\\s]'
         name: 'invalid.illegal.object-property.hjson'
     ]
 
@@ -196,6 +196,7 @@ repository:
         )
         \\s*
         (?!\\n)
+        ([,\\{\\}\\[\\]]*)
       )'''
     beginCaptures:
       0:
@@ -212,8 +213,13 @@ repository:
         name: 'invalid.illegal.unrecognized-string-escape.hjson'
       6:
         name: 'invalid.illegal.separator.hjson'
+      7:
+        name: 'invalid.illegal.property-name.hjson'
 
-    end: '(?<!^|:)\\s*\\n'
+    end: '(?<!^|:)\\s*\\n|(?=})|(,)'
+    endCaptures:
+      1:
+        name: 'punctuation.separator.dictionary.pair.hjson'
 
     patterns: [
         include: '#commentsNewline'
@@ -221,7 +227,7 @@ repository:
         include: '#keyValue'
       ,
         # Anything else is invalid
-        match: '[^\\s]+'
+        match: '[^\\s]'
         name: 'invalid.illegal.object-property.hjson'
     ]
 
@@ -232,21 +238,16 @@ repository:
         \\s*
         (:)
         \\s* # capture the line ending if there is no value on the same line
-        (\\})?
+        ([,\\}\\]]*)
       )'''
     beginCaptures:
       1:
         name: 'punctuation.separator.dictionary.key-value.hjson'
       2:
-        name: 'invalid.illegal.object-property.closing-bracket.hjson'
+        name: 'invalid.illegal.object-property.hjson'
 
     # Can't end on an empty line
-    end: '(?<!^)\\s*(?=\\n)|(\\})|(,)'
-    endCaptures:
-      1:
-        name: 'meta.structure.key-value.end.hjson'
-      2:
-        name: 'punctuation.separator.dictionary.pair.hjson'
+    end: '(?<!^)\\s*(?=\\n)|(?=[},])'
 
     name: 'meta.structure.key-value.hjson'
 
@@ -266,7 +267,7 @@ repository:
             name: 'invalid.illegal.object-property.closing-bracket.hjson'
       ,
         # Anything else is invalid
-        match: '[^\\s]+'
+        match: '[^\\s]'
         name: 'invalid.illegal.object-property.hjson'
     ]
 
@@ -279,7 +280,7 @@ repository:
       0:
         name: 'punctuation.definition.array.begin.hjson'
 
-    end: '(\\])(?:\\s*([^,\\s].*)$)?'
+    end: '(\\])(?:\\s*([^,\\s]+))?'
     endCaptures:
       1:
         name: 'punctuation.definition.array.end.hjson'
@@ -299,7 +300,7 @@ repository:
       0:
         name: 'punctuation.definition.array.begin.hjson'
 
-    end: '(\\])(?:\\s*([^,\\s\\]].*)$)?'
+    end: '(\\])(?:\\s*([^,\\s\\]]+))?'
     endCaptures:
       1:
         name: 'punctuation.definition.array.end.hjson'
@@ -319,7 +320,7 @@ repository:
       0:
         name: 'punctuation.definition.array.begin.hjson'
 
-    end: '(\\])(?:\\s*([^,\\s\\}].*)$)?'
+    end: '(\\])(?:\\s*([^,\\s\\}]+))?'
     endCaptures:
       1:
         name: 'punctuation.definition.array.end.hjson'
@@ -449,7 +450,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: '(")(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?'
+        end: '(")(?:\\s*((?:[^,\\s\\]#/]|/[^/*])+))?'
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -468,7 +469,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: "(')(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?"
+        end: "(')(?:\\s*((?:[^,\\s\\]#/]|/[^/*])+))?"
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -491,7 +492,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: '(")(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?'
+        end: '(")(?:\\s*((?:[^,\\s\\}#/]|/[^/*])+))?'
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -510,7 +511,7 @@ repository:
           0:
             name: 'punctuation.definition.string.begin.hjson'
 
-        end: "(')(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?"
+        end: "(')(?:\\s*((?:[^,\\s\\}#/]|/[^/*])+))?"
         endCaptures:
           1:
             name: 'punctuation.definition.string.end.hjson'
@@ -582,7 +583,7 @@ repository:
       0:
         name: 'punctuation.definition.string.begin.hjson'
 
-    end: "(''')(?:\\s*((?:[^,\\s\\]#/]|/[^/*]).*)$)?"
+    end: "(''')(?:\\s*((?:[^,\\s\\]#/]|/[^/*])+))?"
     endCaptures:
       1:
         name: 'punctuation.definition.string.end.hjson'
@@ -598,7 +599,7 @@ repository:
       0:
         name: 'punctuation.definition.string.begin.hjson'
 
-    end: "(''')(?:\\s*((?:[^,\\s\\}#/]|/[^/*]).*)$)?"
+    end: "(''')(?:\\s*((?:[^,\\s\\}#/]|/[^/*])+))?"
     endCaptures:
       1:
         name: 'punctuation.definition.string.end.hjson'
